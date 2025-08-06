@@ -18,6 +18,8 @@ return [
     'central_domains' => [
         '127.0.0.1',
         'localhost',
+        'ysollo.com',
+        'ysollo.test',
     ],
 
     /**
@@ -50,8 +52,8 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'tenant',
-        'suffix' => '',
+        'prefix' => '',
+        'suffix' => '_tenant',
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.

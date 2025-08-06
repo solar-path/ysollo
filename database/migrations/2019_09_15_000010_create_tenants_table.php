@@ -17,11 +17,14 @@ class CreateTenantsTable extends Migration
     {
         Schema::create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
-
-            // your custom columns may go here
-
+            $table->string('workspace_name');
+            $table->string('slug')->unique();
+            $table->unsignedBigInteger('owner_id');
             $table->timestamps();
             $table->json('data')->nullable();
+            
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index('slug');
         });
     }
 

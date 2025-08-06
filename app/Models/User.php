@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -44,5 +46,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    
+    public function ownedTenants(): HasMany
+    {
+        return $this->hasMany(Tenant::class, 'owner_id');
+    }
+    
+    public function tenants(): BelongsToMany
+    {
+        return $this->belongsToMany(Tenant::class, 'tenant_users', 'user_id', 'tenant_id')
+            ->withPivot(['role', 'status', 'joined_at'])
+            ->withTimestamps();
+    }
+    
+    public function activeTenants()
+    {
+        return $this->tenants()->wherePivot('status', 'active');
+    }
+    
+    public function getTenantRole($tenantId)
+    {
+        $tenant = $this->tenants()->where('tenant_id', $tenantId)->first();
+        return $tenant ? $tenant->pivot->role : null;
+    }
+    
+    public function isOwnerOf(Tenant $tenant): bool
+    {
+        return $this->id === $tenant->owner_id;
+    }
+    
+    public function canAccessTenant(Tenant $tenant): bool
+    {
+        return $this->tenants()
+            ->where('tenant_id', $tenant->id)
+            ->wherePivot('status', 'active')
+            ->exists();
     }
 }

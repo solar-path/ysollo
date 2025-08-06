@@ -14,8 +14,12 @@ foreach (config('tenancy.central_domains') as $domain) {
 
         Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('dashboard', function () {
-                return Inertia::render('dashboard');
+                return redirect()->route('workspaces.index');
             })->name('dashboard');
+            
+            Route::get('workspaces', [App\Http\Controllers\WorkspaceController::class, 'index'])->name('workspaces.index');
+            Route::get('workspaces/{tenant}', [App\Http\Controllers\WorkspaceController::class, 'show'])->name('workspaces.show');
+            Route::post('workspaces/{tenant}/switch', [App\Http\Controllers\WorkspaceController::class, 'switchWorkspace'])->name('workspaces.switch');
         });
 
     });
